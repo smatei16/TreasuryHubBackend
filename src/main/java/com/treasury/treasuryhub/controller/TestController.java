@@ -17,6 +17,7 @@ public class TestController {
         return this.testService.getTestById(id);
     }
 
+    @CrossOrigin
     @GetMapping("/getAll")
     public Iterable<Test> getTestAll(){
         return this.testService.getAllTest();
