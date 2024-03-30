@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "https://treasury-hub-a7870221c88d.herokuapp.com/"})
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @CrossOrigin
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody RegisterUserDto registerUserDto)
         throws UserAlreadyExistsException {
