@@ -11,6 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**");
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:9000", "https://treasury-hub-a7870221c88d.herokuapp.com/");
     }
 }
