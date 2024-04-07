@@ -7,6 +7,7 @@ import com.treasury.treasuryhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,6 +47,11 @@ public class UserService implements UserDetailsService {
     public boolean verifyEmailAlreadyUsed(String email) {
         Optional<User> maybeUser = userRepository.findByEmail(email);
         return maybeUser.isPresent();
+    }
+
+    public UserDetails fetchCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (UserDetails) principal;
     }
 
     @Override
