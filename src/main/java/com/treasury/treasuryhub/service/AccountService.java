@@ -48,6 +48,8 @@ public class AccountService {
     }
 
     public void updateAccountBalance(int accountId, double balance) {
-        accountRepository.setAccountBalanceById(balance, accountId);
+        Account account = accountRepository.getAccountById(accountId);
+        account.setBalance(balance);
+        accountRepository.save(account);
     }
 }
