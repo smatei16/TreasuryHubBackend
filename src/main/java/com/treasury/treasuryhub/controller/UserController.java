@@ -44,9 +44,7 @@ public class UserController {
 
     @GetMapping("/user")
     public ResponseEntity<?> fetchUserDetails() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails =(UserDetails) principal;
-        return ResponseEntity.ok(userDetails);
+        return ResponseEntity.ok(userService.fetchCurrentUser());
     }
 
 }
