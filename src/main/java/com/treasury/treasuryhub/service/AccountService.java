@@ -52,4 +52,29 @@ public class AccountService {
         account.setBalance(balance);
         accountRepository.save(account);
     }
+
+    public void registerIncome(int accountId, double amount) {
+        Account account = accountRepository.getAccountById(accountId);
+        double newBalance = account.getBalance() + amount;
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+    }
+
+    public void registerExpense(int accountId, double amount) {
+        Account account = accountRepository.getAccountById(accountId);
+        double newBalance = account.getBalance() - amount;
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+    }
+
+    public void registerTransfer(int sourceAccountId, int destinationAccountId, double amount) {
+        Account sourceAccount = accountRepository.getAccountById(sourceAccountId);
+        Account destinationAccount = accountRepository.getAccountById(destinationAccountId);
+        double sourceBalance = sourceAccount.getBalance() - amount;
+        double destinationBalance = destinationAccount.getBalance() + amount;
+        sourceAccount.setBalance(sourceBalance);
+        destinationAccount.setBalance(destinationBalance);
+        accountRepository.save(sourceAccount);
+        accountRepository.save(destinationAccount);
+    }
 }
