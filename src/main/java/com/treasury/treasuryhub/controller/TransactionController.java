@@ -8,7 +8,10 @@ import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @CrossOrigin
@@ -44,9 +47,12 @@ public class TransactionController {
 
     @GetMapping("/customInterval")
     public ResponseEntity<?> getCustomIntervalTransactions(@RequestBody TransactionIntervalDto transactionIntervalDto) {
-        LocalDateTime startDate = LocalDateTime.parse(transactionIntervalDto.getStartDate());
-        LocalDateTime endDate = LocalDateTime.parse(transactionIntervalDto.getEndDate());
-        return ResponseEntity.ok(transactionService.getUserTransactionsInInterval(startDate, endDate));
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse(transactionIntervalDto.getStartDate(), fmt);
+        LocalDate endDate = LocalDate.parse(transactionIntervalDto.getEndDate(), fmt);
+        LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+        return ResponseEntity.ok(transactionService.getUserTransactionsInInterval(startDateTime, endDateTime));
     }
 
 }

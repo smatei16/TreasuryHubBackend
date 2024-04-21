@@ -13,7 +13,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
     ArrayList<Transaction> getTransactionsByUserId(int userId);
 
-    @Query(value = "select * from transaction t where t.user_id = ?1 and t.create_ts between ?2 and ?3", nativeQuery = true)
+    @Query(value = "select * from th1.transaction t where t.user_id = ?1 and t.create_ts between ?2 and ?3", nativeQuery = true)
     ArrayList<Transaction> getTransactionByUserIdInInterval(int userId, LocalDateTime startDate, LocalDateTime endDate);
 
 
