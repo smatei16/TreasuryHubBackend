@@ -44,7 +44,6 @@ public class TransactionService {
         transaction.setSourceAccountId(transactionDto.getSourceAccountId());
         transaction.setDestinationAccountId(transactionDto.getDestinationAccountId());
         transaction.setDetails(transactionDto.getDetails());
-        transactionRepository.save(transaction);
 
         switch(transaction.getType()) {
             case "INCOME":
@@ -61,6 +60,7 @@ public class TransactionService {
 
             default: throw new RuntimeException("Operation not supported.");
         }
+        transactionRepository.save(transaction);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
