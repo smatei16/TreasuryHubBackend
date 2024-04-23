@@ -13,4 +13,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> userAlreadyRegistered() {
         return new ResponseEntity<>("There is already an account with this email in use.", HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(FeedbackNotFoundException.class)
+    public ResponseEntity<?> feedbackNotFound() {
+        return new ResponseEntity<>("Feedback not found", HttpStatus.NOT_FOUND);
+    }
 }
