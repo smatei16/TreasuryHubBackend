@@ -2,9 +2,12 @@ package com.treasury.treasuryhub.controller;
 
 import com.treasury.treasuryhub.dto.TransactionDto;
 import com.treasury.treasuryhub.dto.TransactionIntervalDto;
+import com.treasury.treasuryhub.exception.AccountNotFoundException;
+import com.treasury.treasuryhub.exception.TransactionNotFoundException;
+import com.treasury.treasuryhub.exception.TransactionTypeNotSupportedException;
 import com.treasury.treasuryhub.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +25,23 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @PostMapping("/save")
-    public ResponseEntity<?> registerTransaction(@RequestBody TransactionDto transactionDto) {
-        return transactionService.registerTransaction(transactionDto);
+    public ResponseEntity<?> registerTransaction(@RequestBody TransactionDto transactionDto) throws AccountNotFoundException, TransactionTypeNotSupportedException {
+        return new ResponseEntity<>(transactionService.registerTransaction(transactionDto), HttpStatus.OK);
     }
 
-    @GetMapping("/getByUser")
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getTransactionById(@PathVariable int id) throws TransactionNotFoundException {
+        return new ResponseEntity<>(transactionService.getTransactionById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
     public ResponseEntity<?> getUserTransactions() {
-        return ResponseEntity.ok(transactionService.getUserTransactions());
+        return new ResponseEntity<>(transactionService.getUserTransactions(), HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllTransactions() {
+        return new ResponseEntity<>(transactionService.getAllTransactions(), HttpStatus.OK);
     }
 
     @GetMapping("/last30days")
@@ -53,6 +66,17 @@ public class TransactionController {
         LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
         LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
         return ResponseEntity.ok(transactionService.getUserTransactionsInInterval(startDateTime, endDateTime));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTransaction(@RequestBody TransactionDto transactionDto, @PathVariable int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException {
+        return new ResponseEntity<>(transactionService.updateTransaction(transactionDto, id), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTransaction(@PathVariable int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException {
+        transactionService.deleteTransaction(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

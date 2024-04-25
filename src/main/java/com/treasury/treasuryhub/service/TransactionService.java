@@ -1,6 +1,12 @@
 package com.treasury.treasuryhub.service;
 
+import com.treasury.treasuryhub.dto.FeedbackDto;
 import com.treasury.treasuryhub.dto.TransactionDto;
+import com.treasury.treasuryhub.exception.AccountNotFoundException;
+import com.treasury.treasuryhub.exception.FeedbackNotFoundException;
+import com.treasury.treasuryhub.exception.TransactionNotFoundException;
+import com.treasury.treasuryhub.exception.TransactionTypeNotSupportedException;
+import com.treasury.treasuryhub.model.Feedback;
 import com.treasury.treasuryhub.model.Transaction;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.TransactionRepository;
@@ -16,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -33,7 +40,7 @@ public class TransactionService {
     private AccountService accountService;
 
     @Transactional
-    public ResponseEntity<?> registerTransaction(TransactionDto transactionDto) {
+    public Transaction registerTransaction(TransactionDto transactionDto) throws AccountNotFoundException, TransactionTypeNotSupportedException {
         UserDetails userDetails = userService.fetchCurrentUser();
         User user = userRepository.findByEmail(userDetails.getUsername()).get();
         Transaction transaction = new Transaction();
@@ -45,37 +52,56 @@ public class TransactionService {
         transaction.setDestinationAccountId(transactionDto.getDestinationAccountId());
         transaction.setDetails(transactionDto.getDetails());
 
-        switch(transaction.getType()) {
-            case "INCOME":
-                accountService.registerIncome(transaction.getSourceAccountId(), transaction.getAmount());
-                break;
+        accountService.registerTransactionAndUpdateBalance(transaction);
 
-            case "EXPENSE":
-                accountService.registerExpense(transaction.getSourceAccountId(), transaction.getAmount());
-                break;
-
-            case "TRANSFER":
-                accountService.registerTransfer(transaction.getSourceAccountId(), transaction.getDestinationAccountId(), transaction.getAmount());
-                break;
-
-            default: throw new RuntimeException("Operation not supported.");
-        }
-        transactionRepository.save(transaction);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return transactionRepository.save(transaction);
     }
 
-    @Transactional
-    public ArrayList<Transaction> getUserTransactions() {
+    public Transaction getTransactionById(int id) throws TransactionNotFoundException {
+        return transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException(id));
+    }
+
+    public List<Transaction> getUserTransactions() {
         UserDetails userDetails = userService.fetchCurrentUser();
         User user = userRepository.findByEmail(userDetails.getUsername()).get();
         return transactionRepository.getTransactionsByUserId(user.getId());
     }
 
-    @Transactional
-    public ArrayList<Transaction> getUserTransactionsInInterval(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
+    }
+
+    public List<Transaction> getUserTransactionsInInterval(LocalDateTime startDate, LocalDateTime endDate) {
         UserDetails userDetails = userService.fetchCurrentUser();
         User user = userRepository.findByEmail(userDetails.getUsername()).get();
         return transactionRepository.getTransactionByUserIdInInterval(user.getId(), startDate, endDate);
+    }
 
+    @Transactional
+    public Transaction updateTransaction(TransactionDto transactionDto, int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException {
+        Transaction transaction =  transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException(id));
+        double initialAmount = transaction.getAmount();
+        transaction.setAmount(-initialAmount);
+        accountService.registerTransactionAndUpdateBalance(transaction);
+        transaction.setTransactionCategoryId(transactionDto.getTransactionCategoryId());
+        transaction.setType(transactionDto.getType());
+        transaction.setAmount(transactionDto.getAmount());
+        transaction.setSourceAccountId(transactionDto.getSourceAccountId());
+        transaction.setDestinationAccountId(transactionDto.getDestinationAccountId());
+        transaction.setDetails(transactionDto.getDetails());
+        accountService.registerTransactionAndUpdateBalance(transaction);
+        return transactionRepository.save(transaction);
+    }
+
+    @Transactional
+    public void deleteTransaction(int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException(id));
+        double initialAmount = transaction.getAmount();
+        transaction.setAmount(-initialAmount);
+        accountService.registerTransactionAndUpdateBalance(transaction);
+        transactionRepository.delete(transaction);
     }
 }

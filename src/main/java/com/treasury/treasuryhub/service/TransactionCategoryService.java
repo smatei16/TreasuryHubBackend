@@ -1,6 +1,7 @@
 package com.treasury.treasuryhub.service;
 
 import com.treasury.treasuryhub.dto.TransactionCategoryDto;
+import com.treasury.treasuryhub.exception.TransactionCategoryNotFoundException;
 import com.treasury.treasuryhub.model.TransactionCategory;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.TransactionCategoryRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -27,24 +29,48 @@ public class TransactionCategoryService {
     @Autowired
     private UserRepository userRepository;
 
-    public ResponseEntity<?> registerTransactionCategory(TransactionCategoryDto transactionCategoryDto) {
+    public TransactionCategory registerTransactionCategory(TransactionCategoryDto transactionCategoryDto) {
         UserDetails userDetails = userService.fetchCurrentUser();
         User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        //TODO 405 not allowed
         if(!Objects.equals(transactionCategoryDto.getTransactionType(), "INCOME") && !Objects.equals(transactionCategoryDto.getTransactionType(), "EXPENSE"))
             throw new RuntimeException("Transaction category type not supported");
         TransactionCategory transactionCategory = new TransactionCategory();
         transactionCategory.setUserId(user.getId());
         transactionCategory.setName(transactionCategoryDto.getName());
         transactionCategory.setTransactionType(transactionCategoryDto.getTransactionType());
-        transactionCategoryRepository.save(transactionCategory);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        return transactionCategoryRepository.save(transactionCategory);
     }
 
-    public ArrayList<TransactionCategory> getUserTransactionCategories() {
+    public TransactionCategory getTransactionCategoryById(int id) throws TransactionCategoryNotFoundException {
+        return transactionCategoryRepository.findById(id)
+                .orElseThrow(() -> new TransactionCategoryNotFoundException(id));
+    }
+
+    public List<TransactionCategory> getTransactionCategoriesByUser() {
         UserDetails userDetails = userService.fetchCurrentUser();
         User user = userRepository.findByEmail(userDetails.getUsername()).get();
         return transactionCategoryRepository.getTransactionCategoriesByUserId(user.getId());
     }
 
+    public List<TransactionCategory> getAllTransactionCategories() {
+        return transactionCategoryRepository.findAll();
+    }
+
+    public TransactionCategory updateTransactionCategory(TransactionCategoryDto transactionCategoryDto, int id) {
+        return transactionCategoryRepository.findById(id)
+                .map(transactionCategory -> {
+                    transactionCategory.setName(transactionCategoryDto.getName());
+                    transactionCategory.setTransactionType(transactionCategoryDto.getTransactionType());
+                    return transactionCategoryRepository.save(transactionCategory);
+                }).orElseGet(() -> registerTransactionCategory(transactionCategoryDto));
+    }
+
+    public void deleteTransactionCategory(int id) throws TransactionCategoryNotFoundException {
+        TransactionCategory transactionCategory = transactionCategoryRepository.findById(id)
+                .orElseThrow(() -> new TransactionCategoryNotFoundException(id));
+        transactionCategoryRepository.delete(transactionCategory);
+    }
 
 }

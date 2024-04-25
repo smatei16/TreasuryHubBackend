@@ -18,4 +18,24 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> feedbackNotFound() {
         return new ResponseEntity<>("Feedback not found", HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<?> accountNotFound() {
+        return new ResponseEntity<>("Account not found", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TransactionCategoryNotFoundException.class)
+    public ResponseEntity<?> transactionCategoryNotFound() {
+        return new ResponseEntity<>("Transaction category not found", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TransactionTypeNotSupportedException.class)
+    public ResponseEntity<?> transactionTypeNotSupported() {
+        return new ResponseEntity<>("Transaction type not supported.", HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(TransactionNotFoundException.class)
+    public ResponseEntity<?> transactionNotFound() {
+        return new ResponseEntity<>("Transaction not found", HttpStatus.NOT_FOUND);
+    }
 }

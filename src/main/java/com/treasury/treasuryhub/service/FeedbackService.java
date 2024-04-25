@@ -48,6 +48,11 @@ public class FeedbackService {
                 .orElseThrow(() -> new FeedbackNotFoundException(id));
     }
 
+    public List<Feedback> getFeedbacksByUser() {
+        UserDetails userDetails = userService.fetchCurrentUser();
+        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        return feedbackRepository.getFeedbackByUserId(user.getId());
+    }
     public List<Feedback> getAllFeedbacks() {
         return feedbackRepository.findAll();
     }

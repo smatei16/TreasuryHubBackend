@@ -1,7 +1,10 @@
 package com.treasury.treasuryhub.service;
 
 import com.treasury.treasuryhub.dto.AccountDto;
+import com.treasury.treasuryhub.exception.AccountNotFoundException;
+import com.treasury.treasuryhub.exception.TransactionTypeNotSupportedException;
 import com.treasury.treasuryhub.model.Account;
+import com.treasury.treasuryhub.model.Transaction;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.AccountRepository;
 import com.treasury.treasuryhub.repository.UserRepository;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AccountService {
@@ -27,7 +31,7 @@ public class AccountService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<?> registerAccount(AccountDto accountDto) {
+    public Account registerAccount(AccountDto accountDto) {
         UserDetails userDetails = userService.fetchCurrentUser();
         User user = userRepository.findByEmail(userDetails.getUsername()).get();
         Account newAccount = new Account();
@@ -36,45 +40,100 @@ public class AccountService {
         newAccount.setAccountType(accountDto.getAccountType());
         newAccount.setAccountNumber(accountDto.getAccountNumber());
         newAccount.setBalance(accountDto.getBalance());
-        accountRepository.save(newAccount);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return accountRepository.save(newAccount);
     }
 
-    public ArrayList<Account> getAccountsByUser() {
+    public Account getAccountById(int id) throws AccountNotFoundException {
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(id));
+    }
+
+    public List<Account> getAccountsByUser() {
         UserDetails userDetails = userService.fetchCurrentUser();
         User user = userRepository.findByEmail(userDetails.getUsername()).get();
         return accountRepository.getAccountByUserId(user.getId());
     }
 
-    public void updateAccountBalance(int accountId, double balance) {
-        Account account = accountRepository.getAccountById(accountId);
-        account.setBalance(balance);
-        accountRepository.save(account);
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
     }
 
-    public void registerIncome(int accountId, double amount) {
-        Account account = accountRepository.getAccountById(accountId);
+    @Transactional
+    public Account updateAccountBalance(int id, double balance) throws AccountNotFoundException {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(id));
+        account.setBalance(balance);
+        return accountRepository.save(account);
+    }
+
+    @Transactional
+    public void registerTransactionAndUpdateBalance(Transaction transaction) throws AccountNotFoundException, TransactionTypeNotSupportedException {
+        switch(transaction.getType()) {
+            case "INCOME":
+                registerIncome(transaction.getSourceAccountId(), transaction.getAmount());
+                break;
+
+            case "EXPENSE":
+                registerExpense(transaction.getSourceAccountId(), transaction.getAmount());
+                break;
+
+            case "TRANSFER":
+                registerTransfer(transaction.getSourceAccountId(), transaction.getDestinationAccountId(), transaction.getAmount());
+                break;
+
+            default: throw new TransactionTypeNotSupportedException(transaction.getType());
+        }
+    }
+
+    @Transactional
+    public void registerIncome(int id, double amount) throws AccountNotFoundException {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(id));
         double newBalance = account.getBalance() + amount;
         account.setBalance(newBalance);
         accountRepository.save(account);
     }
 
-    public void registerExpense(int accountId, double amount) {
-        Account account = accountRepository.getAccountById(accountId);
+    @Transactional
+    public void registerExpense(int id, double amount) throws AccountNotFoundException {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(id));
         double newBalance = account.getBalance() - amount;
         account.setBalance(newBalance);
         accountRepository.save(account);
     }
 
-    public void registerTransfer(int sourceAccountId, int destinationAccountId, double amount) {
-        Account sourceAccount = accountRepository.getAccountById(sourceAccountId);
-        Account destinationAccount = accountRepository.getAccountById(destinationAccountId);
+    @Transactional
+    public void registerTransfer(int sourceAccountId, int destinationAccountId, double amount) throws AccountNotFoundException {
+        Account sourceAccount = accountRepository.findById(sourceAccountId)
+                .orElseThrow(() -> new AccountNotFoundException(sourceAccountId));
+        Account destinationAccount = accountRepository.findById(destinationAccountId)
+                .orElseThrow(() -> new AccountNotFoundException(destinationAccountId));
         double sourceBalance = sourceAccount.getBalance() - amount;
         double destinationBalance = destinationAccount.getBalance() + amount;
         sourceAccount.setBalance(sourceBalance);
         destinationAccount.setBalance(destinationBalance);
         accountRepository.save(sourceAccount);
         accountRepository.save(destinationAccount);
+    }
+
+    @Transactional
+    public Account updateAccount(AccountDto accountDto, int id) {
+        return accountRepository.findById(id)
+                .map(account -> {
+                    account.setBankName(accountDto.getBankName());
+                    account.setAccountType(accountDto.getAccountType());
+                    account.setAccountNumber(accountDto.getAccountNumber());
+                    account.setBalance(accountDto.getBalance());
+                    return accountRepository.save(account);
+                })
+                .orElseGet(() -> registerAccount(accountDto));
+    }
+
+    public void deleteAccount(int id) throws AccountNotFoundException {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(id));
+        accountRepository.delete(account);
     }
 }
