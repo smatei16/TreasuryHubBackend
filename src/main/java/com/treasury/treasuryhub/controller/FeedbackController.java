@@ -26,8 +26,13 @@ public class FeedbackController {
         return new ResponseEntity<>(feedbackService.getFeedbackById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<?> getFeedbackByUser() {
+        return new ResponseEntity<>(feedbackService.getFeedbacksByUser(), HttpStatus.OK);
+    }
+
     @GetMapping("/all")
-    public ResponseEntity<?> getAllFeedback() {
+    public ResponseEntity<?> getAllFeedbacks() {
         return new ResponseEntity<>(feedbackService.getAllFeedbacks(), HttpStatus.OK);
     }
 
