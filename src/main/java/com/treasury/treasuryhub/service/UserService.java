@@ -7,6 +7,8 @@ import com.treasury.treasuryhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,8 +16,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -38,6 +40,7 @@ public class UserService implements UserDetailsService {
         newUser.setEmail(signUpUserDto.getEmail());
 //        newUser.setPassword(signUpUserDto.getPassword());
         newUser.setPassword(passwordEncoder.encode(signUpUserDto.getPassword()));
+        newUser.setRole(signUpUserDto.getRole());
 
         userRepository.save(newUser);
 
@@ -58,6 +61,12 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByEmail(username);
         User user = userOptional.orElseThrow(() -> new UsernameNotFoundException("User with email " + username + " not found" ));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>());
+//        Set<String> roles = Set.of(user.getRole());
+        String role = user.getRole();
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), Collections.singletonList(new SimpleGrantedAuthority(role)));
+    }
+
+    private Collection<? extends GrantedAuthority> authoritiesConverter(Set<String> roles) {
+        return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 }

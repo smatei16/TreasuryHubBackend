@@ -33,4 +33,7 @@ public class User {
     @CreationTimestamp
     @Column(name = "create_ts")
     private LocalDateTime create_ts;
+
+    @Column(name = "role")
+    private String role;
 }

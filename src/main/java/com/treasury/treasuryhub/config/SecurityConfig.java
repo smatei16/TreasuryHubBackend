@@ -40,9 +40,14 @@ public class SecurityConfig {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(
+                            "/api.yaml",
+                            "/api-docs.html",
+                            "/v3/**",
+                            "/swagger-ui/**",
                             "/login",
                             "/register"
                     ).permitAll();
+                    request.requestMatchers("/account/all").hasAuthority("ADMIN");
                     request.anyRequest().authenticated();
                 })
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
