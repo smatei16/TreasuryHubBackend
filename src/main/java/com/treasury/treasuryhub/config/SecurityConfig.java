@@ -47,7 +47,14 @@ public class SecurityConfig {
                             "/login",
                             "/register"
                     ).permitAll();
-                    request.requestMatchers("/account/all").hasAuthority("ADMIN");
+                    request.requestMatchers(
+                            "/account/all",
+                            "/user/all",
+                            "/feedback/all",
+                            "/transaction/category/all",
+                            "/transaction/all",
+                            "/user/delete/**"
+                            ).hasAuthority("ADMIN");
                     request.anyRequest().authenticated();
                 })
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->

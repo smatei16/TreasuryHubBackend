@@ -38,4 +38,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> transactionNotFound() {
         return new ResponseEntity<>("Transaction not found", HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(NoSuchUserException.class)
+    public ResponseEntity<?> userNotFound() {
+        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+    }
 }

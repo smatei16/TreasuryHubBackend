@@ -1,6 +1,7 @@
 package com.treasury.treasuryhub.service;
 
 import com.treasury.treasuryhub.dto.SignUpUserDto;
+import com.treasury.treasuryhub.exception.NoSuchUserException;
 import com.treasury.treasuryhub.exception.UserAlreadyExistsException;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.UserRepository;
@@ -28,7 +29,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<?> registerUser(SignUpUserDto signUpUserDto)
+    public User registerUser(SignUpUserDto signUpUserDto)
         throws UserAlreadyExistsException {
         if(verifyEmailAlreadyUsed(signUpUserDto.getEmail())) {
             throw new UserAlreadyExistsException("There is already an account with this email in use.");
@@ -42,9 +43,11 @@ public class UserService implements UserDetailsService {
         newUser.setPassword(passwordEncoder.encode(signUpUserDto.getPassword()));
         newUser.setRole(signUpUserDto.getRole());
 
-        userRepository.save(newUser);
+        return userRepository.save(newUser);
+    }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public boolean verifyEmailAlreadyUsed(String email) {
@@ -68,5 +71,11 @@ public class UserService implements UserDetailsService {
 
     private Collection<? extends GrantedAuthority> authoritiesConverter(Set<String> roles) {
         return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    public void deleteUser(int id) throws NoSuchUserException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchUserException("User with id " + id + " does not exist"));
+        userRepository.delete(user);
     }
 }

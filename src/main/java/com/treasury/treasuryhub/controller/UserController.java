@@ -3,11 +3,13 @@ package com.treasury.treasuryhub.controller;
 import com.treasury.treasuryhub.config.JwtConfig;
 import com.treasury.treasuryhub.dto.SignInUserDto;
 import com.treasury.treasuryhub.dto.SignUpUserDto;
+import com.treasury.treasuryhub.exception.NoSuchUserException;
 import com.treasury.treasuryhub.exception.UserAlreadyExistsException;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.UserRepository;
 import com.treasury.treasuryhub.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,7 +39,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> signUpUser(@RequestBody SignUpUserDto signUpUserDto)
         throws UserAlreadyExistsException {
-        return userService.registerUser(signUpUserDto);
+        return new ResponseEntity<>(userService.registerUser(signUpUserDto), HttpStatus.OK);
     }
 
     @PostMapping("/login")
@@ -53,4 +55,14 @@ public class UserController {
         return ResponseEntity.ok(userService.fetchCurrentUser());
     }
 
+    @GetMapping("/user/all")
+    public ResponseEntity<?> getAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user/delete/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable int id) throws NoSuchUserException {
+        userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
