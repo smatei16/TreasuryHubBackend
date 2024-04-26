@@ -23,6 +23,7 @@ public class JwtConfig {
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
+                .claim("role", userDetails.getAuthorities())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + Jwt_valid))
                 .signWith(key)
@@ -30,7 +31,7 @@ public class JwtConfig {
     }
 
     public <T> T extractClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        Claims allClaims =  Jwts.parserBuilder()
+        Claims allClaims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
