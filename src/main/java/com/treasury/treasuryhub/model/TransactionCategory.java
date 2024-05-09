@@ -21,6 +21,6 @@ public class TransactionCategory {
     @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "transaction_type")
     private String transactionType;
 }
