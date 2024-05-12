@@ -27,7 +27,7 @@ public class TransactionCategoryController {
         return new ResponseEntity<>(transactionCategoryService.getTransactionCategoryById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/getByUser")
+    @GetMapping("/user")
     public ResponseEntity<?> getTransactionCategoriesByUser() {
         return new ResponseEntity<>(transactionCategoryService.getTransactionCategoriesByUser(), HttpStatus.OK);
     }

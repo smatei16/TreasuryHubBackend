@@ -50,8 +50,13 @@ public class UserController {
         return ResponseEntity.ok(jwtConfig.generateToken(userDetails));
     }
 
-    @GetMapping("/user")
+    @GetMapping("/userdetails")
     public ResponseEntity<?> fetchUserDetails() {
+        return ResponseEntity.ok(userService.fetchCurrentUserDetails());
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> fetchUser() {
         return ResponseEntity.ok(userService.fetchCurrentUser());
     }
 
@@ -60,7 +65,12 @@ public class UserController {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/user/delete/{id}")
+    @PutMapping("/user/{id}")
+    public ResponseEntity<?> updateUser(@RequestBody SignUpUserDto signUpUserDto, @PathVariable int id) throws NoSuchUserException {
+        return new ResponseEntity<>(userService.updateUser(signUpUserDto, id), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable int id) throws NoSuchUserException {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.OK);

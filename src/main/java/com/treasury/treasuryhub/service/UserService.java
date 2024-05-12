@@ -6,8 +6,6 @@ import com.treasury.treasuryhub.exception.UserAlreadyExistsException;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,9 +53,15 @@ public class UserService implements UserDetailsService {
         return maybeUser.isPresent();
     }
 
-    public UserDetails fetchCurrentUser() {
+    public UserDetails fetchCurrentUserDetails() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return (UserDetails) principal;
+    }
+
+    public User fetchCurrentUser() {
+        UserDetails userDetails = fetchCurrentUserDetails();
+        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        return user;
     }
 
     @Override
@@ -71,6 +75,19 @@ public class UserService implements UserDetailsService {
 
     private Collection<? extends GrantedAuthority> authoritiesConverter(Set<String> roles) {
         return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    public User updateUser(SignUpUserDto signUpUserDto, int id) throws NoSuchUserException {
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setFirstName(signUpUserDto.getFirstName());
+                    user.setLastName(signUpUserDto.getLastName());
+                    user.setEmail(signUpUserDto.getEmail());
+                    user.setPassword(passwordEncoder.encode(signUpUserDto.getPassword()));
+                    user.setRole(signUpUserDto.getRole());
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new NoSuchUserException("User with id " + id + " does not exist"));
     }
 
     public void deleteUser(int id) throws NoSuchUserException {
