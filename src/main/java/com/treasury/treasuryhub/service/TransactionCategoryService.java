@@ -5,15 +5,9 @@ import com.treasury.treasuryhub.exception.TransactionCategoryNotFoundException;
 import com.treasury.treasuryhub.model.TransactionCategory;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.TransactionCategoryRepository;
-import com.treasury.treasuryhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,12 +20,8 @@ public class TransactionCategoryService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
     public TransactionCategory registerTransactionCategory(TransactionCategoryDto transactionCategoryDto) {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         //TODO 405 not allowed
         if(!Objects.equals(transactionCategoryDto.getTransactionType(), "INCOME") && !Objects.equals(transactionCategoryDto.getTransactionType(), "EXPENSE"))
             throw new RuntimeException("Transaction category type not supported");
@@ -49,8 +39,7 @@ public class TransactionCategoryService {
     }
 
     public List<TransactionCategory> getTransactionCategoriesByUser() {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         return transactionCategoryRepository.getTransactionCategoriesByUserId(user.getId());
     }
 

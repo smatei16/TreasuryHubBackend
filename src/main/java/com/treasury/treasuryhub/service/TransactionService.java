@@ -1,27 +1,17 @@
 package com.treasury.treasuryhub.service;
 
-import com.treasury.treasuryhub.dto.FeedbackDto;
 import com.treasury.treasuryhub.dto.TransactionDto;
 import com.treasury.treasuryhub.exception.AccountNotFoundException;
-import com.treasury.treasuryhub.exception.FeedbackNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionTypeNotSupportedException;
-import com.treasury.treasuryhub.model.Feedback;
 import com.treasury.treasuryhub.model.Transaction;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.TransactionRepository;
-import com.treasury.treasuryhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,15 +24,11 @@ public class TransactionService {
     private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private AccountService accountService;
 
     @Transactional
     public Transaction registerTransaction(TransactionDto transactionDto) throws AccountNotFoundException, TransactionTypeNotSupportedException {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         Transaction transaction = new Transaction();
         transaction.setUserId(user.getId());
         transaction.setTransactionCategoryId(transactionDto.getTransactionCategoryId());
@@ -63,8 +49,7 @@ public class TransactionService {
     }
 
     public List<Transaction> getUserTransactions() {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         return transactionRepository.getTransactionsByUserId(user.getId());
     }
 
@@ -73,8 +58,7 @@ public class TransactionService {
     }
 
     public List<Transaction> getUserTransactionsInInterval(LocalDateTime startDate, LocalDateTime endDate) {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         return transactionRepository.getTransactionByUserIdInInterval(user.getId(), startDate, endDate);
     }
 

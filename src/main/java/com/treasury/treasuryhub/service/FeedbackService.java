@@ -5,15 +5,9 @@ import com.treasury.treasuryhub.exception.FeedbackNotFoundException;
 import com.treasury.treasuryhub.model.Feedback;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.FeedbackRepository;
-import com.treasury.treasuryhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -23,14 +17,10 @@ public class FeedbackService {
     private FeedbackRepository feedbackRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserService userService;
 
     public Feedback registerFeedback(FeedbackDto feedbackDto) {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         Feedback feedback = new Feedback();
         feedback.setUserId(user.getId());
         feedback.setRating(feedbackDto.getRating());
@@ -49,8 +39,7 @@ public class FeedbackService {
     }
 
     public List<Feedback> getFeedbacksByUser() {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         return feedbackRepository.getFeedbackByUserId(user.getId());
     }
     public List<Feedback> getAllFeedbacks() {

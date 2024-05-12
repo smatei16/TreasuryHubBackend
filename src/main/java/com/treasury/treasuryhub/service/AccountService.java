@@ -7,16 +7,10 @@ import com.treasury.treasuryhub.model.Account;
 import com.treasury.treasuryhub.model.Transaction;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.AccountRepository;
-import com.treasury.treasuryhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,14 +20,10 @@ public class AccountService {
     private AccountRepository accountRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserService userService;
 
     public Account registerAccount(AccountDto accountDto) {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         Account newAccount = new Account();
         newAccount.setUserId(user.getId());
         newAccount.setBankName(accountDto.getBankName());
@@ -50,8 +40,7 @@ public class AccountService {
     }
 
     public List<Account> getAccountsByUser() {
-        UserDetails userDetails = userService.fetchCurrentUser();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = userService.fetchCurrentUser();
         return accountRepository.getAccountByUserId(user.getId());
     }
 

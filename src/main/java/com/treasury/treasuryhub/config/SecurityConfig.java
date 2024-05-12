@@ -53,7 +53,8 @@ public class SecurityConfig {
                             "/feedback/all",
                             "/transaction/category/all",
                             "/transaction/all",
-                            "/user/delete/**"
+                            "/user/delete/**",
+                            "/budget/all"
                             ).hasAuthority("ADMIN");
                     request.anyRequest().authenticated();
                 })
