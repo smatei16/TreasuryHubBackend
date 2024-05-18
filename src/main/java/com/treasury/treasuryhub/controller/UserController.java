@@ -1,6 +1,7 @@
 package com.treasury.treasuryhub.controller;
 
 import com.treasury.treasuryhub.config.JwtConfig;
+import com.treasury.treasuryhub.dto.SignInResponseDto;
 import com.treasury.treasuryhub.dto.SignInUserDto;
 import com.treasury.treasuryhub.dto.SignUpUserDto;
 import com.treasury.treasuryhub.exception.NoSuchUserException;
@@ -46,8 +47,9 @@ public class UserController {
     public ResponseEntity<?> signInUser(@RequestBody SignInUserDto signInUserDto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInUserDto.getEmail(), signInUserDto.getPassword()));
         UserDetails userDetails = userService.loadUserByUsername(signInUserDto.getEmail());
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
-        return ResponseEntity.ok(jwtConfig.generateToken(userDetails));
+        SignInResponseDto signInResponseDto = new SignInResponseDto();
+        signInResponseDto.setToken(jwtConfig.generateToken(userDetails));
+        return ResponseEntity.ok(signInResponseDto);
     }
 
     @GetMapping("/userdetails")
