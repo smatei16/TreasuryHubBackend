@@ -8,9 +8,11 @@ import com.treasury.treasuryhub.model.Transaction;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class TransactionService {
         transaction.setSourceAccountId(transactionDto.getSourceAccountId());
         transaction.setDestinationAccountId(transactionDto.getDestinationAccountId());
         transaction.setDetails(transactionDto.getDetails());
+        transaction.setDate(LocalDateTime.parse(transactionDto.getDate()));
 
         accountService.registerTransactionAndUpdateBalance(transaction);
 
@@ -75,6 +78,7 @@ public class TransactionService {
         transaction.setSourceAccountId(transactionDto.getSourceAccountId());
         transaction.setDestinationAccountId(transactionDto.getDestinationAccountId());
         transaction.setDetails(transactionDto.getDetails());
+        transaction.setDate(LocalDateTime.parse(transactionDto.getDate()));
         accountService.registerTransactionAndUpdateBalance(transaction);
         return transactionRepository.save(transaction);
     }
@@ -87,5 +91,10 @@ public class TransactionService {
         transaction.setAmount(-initialAmount);
         accountService.registerTransactionAndUpdateBalance(transaction);
         transactionRepository.delete(transaction);
+    }
+
+    public double getUserTransactionByDateAndTransactionCategory(int month, int year, int categoryId) {
+        User user = userService.fetchCurrentUser();
+        return transactionRepository.getTotalTransactionsSumByCategoryByMonth(user.getId(), month, year, categoryId);
     }
 }

@@ -79,4 +79,13 @@ public class TransactionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/thismonthcategory/{id}")
+    public ResponseEntity<?> getTransactionTotalsCurrentMonthForCategory(@PathVariable int id) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
+        int month = today.getMonthValue();
+        int year = today.getYear();
+        return new ResponseEntity<>(transactionService.getUserTransactionByDateAndTransactionCategory(month, year, id), HttpStatus.OK);
+    }
+
 }

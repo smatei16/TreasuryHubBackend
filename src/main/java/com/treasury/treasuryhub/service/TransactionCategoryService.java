@@ -29,6 +29,8 @@ public class TransactionCategoryService {
         transactionCategory.setUserId(user.getId());
         transactionCategory.setName(transactionCategoryDto.getName());
         transactionCategory.setTransactionType(transactionCategoryDto.getTransactionType());
+        //TH-32 temporarily adding budget here to ease up the solution a bit - might upgrade later with versioning
+        transactionCategory.setBudget(transactionCategoryDto.getBudget());
 
         return transactionCategoryRepository.save(transactionCategory);
     }
@@ -52,6 +54,8 @@ public class TransactionCategoryService {
                 .map(transactionCategory -> {
                     transactionCategory.setName(transactionCategoryDto.getName());
                     transactionCategory.setTransactionType(transactionCategoryDto.getTransactionType());
+                    //TH-32 temporarily adding budget here to ease up the solution a bit - might upgrade later with versioning
+                    transactionCategory.setBudget(transactionCategoryDto.getBudget());
                     return transactionCategoryRepository.save(transactionCategory);
                 }).orElseGet(() -> registerTransactionCategory(transactionCategoryDto));
     }
