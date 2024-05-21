@@ -23,4 +23,8 @@ public class TransactionCategory {
 
     @Column(name = "transaction_type")
     private String transactionType;
+
+    //TH-32 temporarily adding budget here to ease up the solution a bit - might upgrade later with versioning
+    @Column(name = "budget")
+    private Double budget;
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -39,9 +40,16 @@ public class Transaction {
     @Column(name = "details")
     private String details;
 
+    @Column(name = "date")
+    private LocalDateTime date;
+
     //TODO add currency
 
     @Column(name = "create_ts")
     @CreationTimestamp
     private LocalDateTime create_ts;
+
+    @Column(name = "modify_ts")
+    @UpdateTimestamp
+    private LocalDateTime modify_ts;
 }
