@@ -1,5 +1,6 @@
 package com.treasury.treasuryhub.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,6 +41,7 @@ public class Transaction {
     @Column(name = "details")
     private String details;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @Column(name = "date")
     private LocalDateTime date;
 
