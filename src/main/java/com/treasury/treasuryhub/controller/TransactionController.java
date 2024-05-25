@@ -3,6 +3,7 @@ package com.treasury.treasuryhub.controller;
 import com.treasury.treasuryhub.dto.TransactionDto;
 import com.treasury.treasuryhub.dto.TransactionIntervalDto;
 import com.treasury.treasuryhub.exception.AccountNotFoundException;
+import com.treasury.treasuryhub.exception.TransactionCategoryNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionTypeNotSupportedException;
 import com.treasury.treasuryhub.service.TransactionService;
@@ -25,7 +26,7 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @PostMapping("/save")
-    public ResponseEntity<?> registerTransaction(@RequestBody TransactionDto transactionDto) throws AccountNotFoundException, TransactionTypeNotSupportedException {
+    public ResponseEntity<?> registerTransaction(@RequestBody TransactionDto transactionDto) throws AccountNotFoundException, TransactionTypeNotSupportedException, TransactionCategoryNotFoundException {
         return new ResponseEntity<>(transactionService.registerTransaction(transactionDto), HttpStatus.OK);
     }
 
@@ -37,6 +38,11 @@ public class TransactionController {
     @GetMapping("/user")
     public ResponseEntity<?> getUserTransactions() {
         return new ResponseEntity<>(transactionService.getUserTransactions(), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/detailed")
+    public ResponseEntity<?> getDetailedUserTransactions() {
+        return new ResponseEntity<>(transactionService.getDetailedUserTransactions(), HttpStatus.OK);
     }
 
     @GetMapping("/all")
@@ -68,13 +74,23 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getUserTransactionsInInterval(startDateTime, endDateTime));
     }
 
+    @GetMapping("/customIntervalDetailed")
+    public ResponseEntity<?> getCustomIntervalDetailedTransactions(@RequestBody TransactionIntervalDto transactionIntervalDto) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse(transactionIntervalDto.getStartDate(), fmt);
+        LocalDate endDate = LocalDate.parse(transactionIntervalDto.getEndDate(), fmt);
+        LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+        return ResponseEntity.ok(transactionService.getDetailedUserTransactionsInInterval(startDateTime, endDateTime));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTransaction(@RequestBody TransactionDto transactionDto, @PathVariable int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException {
+    public ResponseEntity<?> updateTransaction(@RequestBody TransactionDto transactionDto, @PathVariable int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException, TransactionCategoryNotFoundException {
         return new ResponseEntity<>(transactionService.updateTransaction(transactionDto, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTransaction(@PathVariable int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException {
+    public ResponseEntity<?> deleteTransaction(@PathVariable int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException, TransactionCategoryNotFoundException {
         transactionService.deleteTransaction(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

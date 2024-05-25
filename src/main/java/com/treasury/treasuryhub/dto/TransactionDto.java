@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 @Setter
 public class TransactionDto {
 
-    private int transactionCategoryId;
-    private String type;
+    private Integer transactionCategoryId;
     private Double amount;
-    private int sourceAccountId;
-    private int destinationAccountId;
+    private Integer sourceAccountId;
+    private Integer destinationAccountId;
+    private String merchant;
     private String details;
     private String date;
 }
