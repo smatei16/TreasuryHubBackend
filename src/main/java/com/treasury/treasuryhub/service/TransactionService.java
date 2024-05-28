@@ -90,20 +90,8 @@ public class TransactionService {
     }
 
     public DetailedTransactionResponseDto getDetailedTransactionById(int id) {
-        Object[] result =  transactionRepository.getDetailedTransactionById(id);
-        return new DetailedTransactionResponseDto((Integer) result[0],
-                (Integer) result[1],
-                (Integer) result[2],
-                (String) result[3],
-                (String) result[4],
-                (Double) result[5],
-                (Integer) result[6],
-                (String) result[7],
-                (Integer) result[8],
-                (String) result[9],
-                (String) result[10],
-                (String) result[11],
-                (Timestamp) result[12]);
+        ArrayList<Object[]> results =  transactionRepository.getDetailedTransactionById(id);
+        return convertObjectsToDetailedDto(results).get(0);
     }
 
     @Transactional
