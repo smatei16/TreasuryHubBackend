@@ -45,6 +45,11 @@ public class TransactionController {
         return new ResponseEntity<>(transactionService.getDetailedUserTransactions(), HttpStatus.OK);
     }
 
+    @GetMapping("/user/detailed/{id}")
+    public ResponseEntity<?> getDetailedTransactionById(@PathVariable int id) {
+        return new ResponseEntity<>(transactionService.getDetailedTransactionById(id), HttpStatus.OK);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllTransactions() {
         return new ResponseEntity<>(transactionService.getAllTransactions(), HttpStatus.OK);

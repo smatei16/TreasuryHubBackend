@@ -89,6 +89,11 @@ public class TransactionService {
         return convertObjectsToDetailedDto(results);
     }
 
+    public List<DetailedTransactionResponseDto> getDetailedTransactionById(int id) {
+        ArrayList<Object[]> results =  transactionRepository.getDetailedTransactionById(id);
+        return convertObjectsToDetailedDto(results);
+    }
+
     @Transactional
     public Transaction updateTransaction(TransactionDto transactionDto, int id) throws TransactionNotFoundException, AccountNotFoundException, TransactionTypeNotSupportedException, TransactionCategoryNotFoundException {
         Transaction transaction =  transactionRepository.findById(id)
