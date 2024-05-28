@@ -103,7 +103,7 @@ public class TransactionService {
                 (String) result[9],
                 (String) result[10],
                 (String) result[11],
-                (Timestamp) result[12])
+                (Timestamp) result[12]);
     }
 
     @Transactional
