@@ -30,13 +30,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 //            "WHERE t.user_id = ?1", nativeQuery = true)
 //    ArrayList<Object[]> getDetailedTransactionByUserId(int userId);
 
-    @Query(value = "select * from th1.v_ifout_detailed_transactions t where t.user_id = ?1 order by date asc", nativeQuery = true)
+    @Query(value = "select * from th1.v_ifout_detailed_transactions t where t.user_id = ?1 order by date desc", nativeQuery = true)
     ArrayList<Object[]> getDetailedTransactionByUserId(int userId);
 
     @Query(value = "select * from th1.v_ifout_detailed_transactions t where t.id = ?1", nativeQuery = true)
     ArrayList<Object[]> getDetailedTransactionById(int id);
 
-    @Query(value = "select * from th1.v_ifout_detailed_transactions t where t.user_id = ?1 and t.date between ?2 and ?3 order by date asc", nativeQuery = true)
+    @Query(value = "select * from th1.v_ifout_detailed_transactions t where t.user_id = ?1 and t.date between ?2 and ?3 order by date desc", nativeQuery = true)
     ArrayList<Object[]> getDetailedTransactionByUserIdInInterval(int userId, LocalDateTime startDate, LocalDateTime endDate);
 
 }
