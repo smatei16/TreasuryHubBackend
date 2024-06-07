@@ -24,10 +24,11 @@ public class DetailedTransactionResponseDto {
     private String details;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private Timestamp date;
+    private String url;
 
     public DetailedTransactionResponseDto(Integer id, Integer userId, Integer transactionCategoryId, String name, String type, Double amount,
                                           Integer sourceAccountId, String sourceAccountBankName, Integer destinationAccountId,
-                                          String destinationAccountBankName, String merchant, String details, Timestamp date) {
+                                          String destinationAccountBankName, String merchant, String details, Timestamp date, String url) {
         this.id = id;
         this.userId = userId;
         this.transactionCategoryId =  transactionCategoryId;
@@ -41,5 +42,6 @@ public class DetailedTransactionResponseDto {
         this.merchant = merchant;
         this.details = details;
         this.date = date;
+        this.url = url;
     }
 }

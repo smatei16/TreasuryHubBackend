@@ -16,4 +16,5 @@ public class TransactionDto {
     private String merchant;
     private String details;
     private String date;
+    private String url;
 }
