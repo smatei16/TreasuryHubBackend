@@ -24,19 +24,19 @@ public class Transaction {
     private int userId;
 
     @Column(name = "transaction_category_id")
-    private int transactionCategoryId;
-
-    @Column(name = "type")
-    private String type;
+    private Integer transactionCategoryId;
 
     @Column(name = "amount")
     private Double amount;
 
     @Column(name = "source_account_id")
-    private int sourceAccountId;
+    private Integer sourceAccountId;
 
     @Column(name = "destination_account_id")
-    private int destinationAccountId;
+    private Integer destinationAccountId;
+
+    @Column(name = "merchant")
+    private String merchant;
 
     @Column(name = "details")
     private String details;

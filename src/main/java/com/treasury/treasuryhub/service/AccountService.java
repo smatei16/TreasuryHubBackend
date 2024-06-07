@@ -2,6 +2,7 @@ package com.treasury.treasuryhub.service;
 
 import com.treasury.treasuryhub.dto.AccountDto;
 import com.treasury.treasuryhub.exception.AccountNotFoundException;
+import com.treasury.treasuryhub.exception.TransactionCategoryNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionTypeNotSupportedException;
 import com.treasury.treasuryhub.model.Account;
 import com.treasury.treasuryhub.model.Transaction;
@@ -21,6 +22,9 @@ public class AccountService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TransactionCategoryService transactionCategoryService;
 
     public Account registerAccount(AccountDto accountDto) {
         User user = userService.fetchCurrentUser();
@@ -57,21 +61,22 @@ public class AccountService {
     }
 
     @Transactional
-    public void registerTransactionAndUpdateBalance(Transaction transaction) throws AccountNotFoundException, TransactionTypeNotSupportedException {
-        switch(transaction.getType()) {
-            case "INCOME":
-                registerIncome(transaction.getSourceAccountId(), transaction.getAmount());
-                break;
+    public void registerTransactionAndUpdateBalance(Transaction transaction) throws AccountNotFoundException, TransactionTypeNotSupportedException, TransactionCategoryNotFoundException {
+        if(transaction.getTransactionCategoryId() == null && transaction.getSourceAccountId() != null &&  transaction.getDestinationAccountId() != null) {
+            registerTransfer(transaction.getSourceAccountId(), transaction.getDestinationAccountId(), transaction.getAmount());
+        } else {
+            String transactionType = transactionCategoryService.getTransactionCategoryById(transaction.getTransactionCategoryId()).getTransactionType();
+            switch(transactionType) {
+                case "INCOME":
+                    registerIncome(transaction.getSourceAccountId(), transaction.getAmount());
+                    break;
 
-            case "EXPENSE":
-                registerExpense(transaction.getSourceAccountId(), transaction.getAmount());
-                break;
+                case "EXPENSE":
+                    registerExpense(transaction.getSourceAccountId(), transaction.getAmount());
+                    break;
 
-            case "TRANSFER":
-                registerTransfer(transaction.getSourceAccountId(), transaction.getDestinationAccountId(), transaction.getAmount());
-                break;
-
-            default: throw new TransactionTypeNotSupportedException(transaction.getType());
+                default: throw new TransactionTypeNotSupportedException(transactionType);
+            }
         }
     }
 
