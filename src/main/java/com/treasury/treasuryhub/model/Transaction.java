@@ -45,6 +45,9 @@ public class Transaction {
     @Column(name = "date")
     private LocalDateTime date;
 
+    @Column(name = "url")
+    private String url;
+
     //TODO add currency
 
     @Column(name = "create_ts")

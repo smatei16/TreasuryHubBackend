@@ -46,6 +46,7 @@ public class TransactionService {
         transaction.setMerchant(transactionDto.getMerchant());
         transaction.setDetails(transactionDto.getDetails());
         transaction.setDate(LocalDateTime.parse(transactionDto.getDate()));
+        transaction.setUrl(transactionDto.getUrl());
 
         accountService.registerTransactionAndUpdateBalance(transaction);
 
@@ -108,6 +109,7 @@ public class TransactionService {
         transaction.setMerchant(transactionDto.getMerchant());
         transaction.setDetails(transactionDto.getDetails());
         transaction.setDate(LocalDateTime.parse(transactionDto.getDate()));
+        transaction.setUrl(transactionDto.getUrl());
         accountService.registerTransactionAndUpdateBalance(transaction);
         return transactionRepository.save(transaction);
     }
@@ -141,7 +143,8 @@ public class TransactionService {
                         (String) result[9],
                         (String) result[10],
                         (String) result[11],
-                        (Timestamp) result[12])
+                        (Timestamp) result[12],
+                        (String) result[13])
         ).collect(Collectors.toList());
     }
 }
