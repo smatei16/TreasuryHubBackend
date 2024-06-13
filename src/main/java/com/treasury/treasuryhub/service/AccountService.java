@@ -34,6 +34,7 @@ public class AccountService {
         newAccount.setAccountType(accountDto.getAccountType());
         newAccount.setAccountNumber(accountDto.getAccountNumber());
         newAccount.setBalance(accountDto.getBalance());
+        newAccount.setCurrency(accountDto.getCurrency());
 
         return accountRepository.save(newAccount);
     }
@@ -120,6 +121,7 @@ public class AccountService {
                     account.setAccountType(accountDto.getAccountType());
                     account.setAccountNumber(accountDto.getAccountNumber());
                     account.setBalance(accountDto.getBalance());
+                    account.setCurrency(accountDto.getCurrency());
                     return accountRepository.save(account);
                 })
                 .orElseGet(() -> registerAccount(accountDto));

@@ -35,6 +35,9 @@ public class Account {
     @Column(name = "balance")
     private Double balance;
 
+    @Column(name = "currency")
+    private String currency;
+
     @Column(name = "create_ts")
     @CreationTimestamp
     private LocalDateTime create_ts;
