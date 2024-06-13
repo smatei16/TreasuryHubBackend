@@ -144,7 +144,9 @@ public class TransactionService {
                         (String) result[10],
                         (String) result[11],
                         (Timestamp) result[12],
-                        (String) result[13])
+                        (String) result[13],
+                        (String) result[14],
+                        (String) result[15])
         ).collect(Collectors.toList());
     }
 }
