@@ -70,4 +70,8 @@ public class StockService {
         return stockRepository.findAll();
     }
 
+    public List<Stock> getStocksByQuery(String query) {
+        return stockRepository.getStocksByQuery(query.toLowerCase());
+    }
+
 }

@@ -24,4 +24,9 @@ public class StockController {
     public ResponseEntity<?> getAllStocks() {
         return new ResponseEntity<>(stockService.getAllStocks(), HttpStatus.OK);
     }
+
+    @GetMapping("/{query}")
+    public ResponseEntity<?> getStocksByQuery(@PathVariable String query) {
+        return new ResponseEntity<>(stockService.getStocksByQuery(query), HttpStatus.OK);
+    }
 }
