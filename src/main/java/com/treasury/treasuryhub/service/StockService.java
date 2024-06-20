@@ -66,4 +66,12 @@ public class StockService {
         }
     }
 
+    public List<Stock> getAllStocks() {
+        return stockRepository.findAll();
+    }
+
+    public List<Stock> getStocksByQuery(String query) {
+        return stockRepository.getStocksByQuery(query.toLowerCase());
+    }
+
 }
