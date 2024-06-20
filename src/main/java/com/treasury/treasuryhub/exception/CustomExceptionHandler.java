@@ -48,4 +48,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> budgetNotFound() {
         return new ResponseEntity<>("Budget not found", HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(UserStockNotFoundException.class)
+    public ResponseEntity<?> userStockNotFound() {
+        return new ResponseEntity<>("User stock not found", HttpStatus.NOT_FOUND);
+    }
 }
