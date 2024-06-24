@@ -1,5 +1,6 @@
 package com.treasury.treasuryhub.service;
 
+import com.treasury.treasuryhub.dto.CategoryTotalsDto;
 import com.treasury.treasuryhub.dto.DetailedTransactionResponseDto;
 import com.treasury.treasuryhub.dto.TransactionDto;
 import com.treasury.treasuryhub.exception.AccountNotFoundException;
@@ -129,6 +130,21 @@ public class TransactionService {
         return transactionRepository.getTotalTransactionsSumByCategoryByMonth(user.getId(), month, year, categoryId);
     }
 
+    public List<CategoryTotalsDto> getCategoryTotalsByDateAndType(LocalDate startDate, LocalDate endDate, String type) {
+        User user = userService.fetchCurrentUser();
+        return convertObjectsToCategoryTotals(transactionRepository.getCategoryTotalsByMonthAndType(user.getId(), startDate, endDate, type));
+    }
+
+    public List<CategoryTotalsDto> getCategoryTotalsByDate(LocalDate startDate, LocalDate endDate) {
+        User user = userService.fetchCurrentUser();
+        return convertObjectsToCategoryTotals(transactionRepository.getCategoryTotalsByMonth(user.getId(), startDate, endDate));
+    }
+
+    public Double getTotalsByDateAndType(LocalDate startDate, LocalDate endDate, String type) {
+        User user = userService.fetchCurrentUser();
+        return transactionRepository.getTotalsByMonthAndType(user.getId(), startDate, endDate, type);
+    }
+
     public List<DetailedTransactionResponseDto> convertObjectsToDetailedDto(List<Object[]> results) {
         return results.stream().map(result ->
                 new DetailedTransactionResponseDto((Integer) result[0],
@@ -147,6 +163,16 @@ public class TransactionService {
                         (String) result[13],
                         (String) result[14],
                         (String) result[15])
+        ).collect(Collectors.toList());
+    }
+
+    public List<CategoryTotalsDto> convertObjectsToCategoryTotals(List<Object[]> results) {
+        return results.stream().map(result ->
+                new CategoryTotalsDto((Integer) result[0],
+                        (String) result[1],
+                        (String) result[2],
+                        (Double) result[3],
+                        (Double) result[4])
         ).collect(Collectors.toList());
     }
 }
