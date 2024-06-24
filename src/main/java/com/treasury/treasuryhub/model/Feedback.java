@@ -28,9 +28,6 @@ public class Feedback {
     @Column(name = "frequency")
     private String frequency;
 
-    @Column(name = "favourite_functionalities")
-    private List<String> favouriteFunctionalities;
-
     @Column(name = "comment")
     private String comment;
 

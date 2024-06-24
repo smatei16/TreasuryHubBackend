@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome Email</title>
+    <style>
+        .logo {
+            color: #41B06E;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="logo">Treasury Hub</div>
+<h1>Welcome, <span th:text="${name}">User</span>!</h1>
+<p>We are excited to have you join our community.</p>
+<p>We hope you will reach your saving objectives with us.</p>
+<p>If you have any questions, feel free to reach out to us at treasuryhub@outlook.com.</p>
+<p>Best regards,<br/>Treasury Hub Team</p>
+</body>
+</html>

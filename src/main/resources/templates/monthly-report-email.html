@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Report</title>
+    <style>
+        .logo {
+            color: #41B06E;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .over-budget {
+            color: #B91C1C;
+        }
+        .within-budget {
+            color: #41B06E;
+        }
+        .income {
+            color: #41B06E;
+            font-size: 20px;
+        }
+        .expense {
+            color: #B91C1C;
+            font-size: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<div class="logo">Treasury Hub</div>
+<h1>Monthly Report</h1>
+<p>Hello, <span th:text="${name}">User</span>,</p>
+<p>Here is your monthly report:</p>
+<p class="income">Total Income: <span th:text="${totalIncome}">$0.00</span></p>
+<p class="expense">Total Expense: <span th:text="${totalExpense}">$0.00</span></p>
+<table>
+    <thead>
+    <tr>
+        <th>Category</th>
+        <th>Budget</th>
+        <th>Spent</th>
+        <th>Percentage</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="expense : ${expenses}">
+        <td th:text="${expense.name}">Category</td>
+        <td th:text="${expense.budget != null ? expense.budget : 'Not set'}">1000</td>
+        <td th:text="${expense.amount}">900</td>
+        <td th:text="${expense.budget != null ? #numbers.formatDecimal((expense.amount / expense.budget) * 100, 0, 2) + '%' : '-'}"
+            th:class="${expense.budget != null && expense.amount > expense.budget} ? 'over-budget' : 'within-budget'">
+            90%
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p>Best regards,<br/>The Treasury Hub Team</p>
+</body>
+</html>

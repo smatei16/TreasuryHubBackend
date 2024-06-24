@@ -25,7 +25,6 @@ public class FeedbackService {
         feedback.setUserId(user.getId());
         feedback.setRating(feedbackDto.getRating());
         feedback.setFrequency(feedbackDto.getFrequency());
-        feedback.setFavouriteFunctionalities(feedbackDto.getFavouriteFunctionalities());
         feedback.setComment(feedbackDto.getComment());
 
         System.out.println(feedbackDto.getFavouriteFunctionalities());
@@ -51,7 +50,6 @@ public class FeedbackService {
                 .map(feedback -> {
                     feedback.setRating(feedbackDto.getRating());
                     feedback.setFrequency(feedbackDto.getFrequency());
-                    feedback.setFavouriteFunctionalities(feedbackDto.getFavouriteFunctionalities());
                     feedback.setComment(feedbackDto.getComment());
                     return feedbackRepository.save(feedback);
                 })
