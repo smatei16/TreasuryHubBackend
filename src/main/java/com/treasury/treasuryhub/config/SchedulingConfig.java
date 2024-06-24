@@ -56,7 +56,7 @@ public class SchedulingConfig {
             model.put("expenses", categories);
             model.put("totalIncome", income);
             model.put("totalExpense", expense);
-            emailService.sendLastMonthStatus(user.getEmail(), model);
+//            emailService.sendLastMonthStatus(user.getEmail(), model);
         }
     }
 }

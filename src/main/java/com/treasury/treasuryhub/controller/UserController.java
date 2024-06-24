@@ -59,7 +59,7 @@ public class UserController {
         User newUser = userService.registerUser(signUpUserDto);
         Map<String, Object> model = new HashMap<>();
         model.put("name", newUser.getFirstName());
-        emailService.sendWelcomeEmail(newUser.getEmail(), model);
+//        emailService.sendWelcomeEmail(newUser.getEmail(), model);
         return new ResponseEntity<>(newUser, HttpStatus.OK);
     }
 
