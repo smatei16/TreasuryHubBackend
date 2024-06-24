@@ -30,12 +30,6 @@ public class EmailService {
     private TransactionService transactionService;
 
     public void sendWelcomeEmail(String to, Map<String, Object> templateModel) throws MessagingException {
-        Properties properties = System.getProperties();
-        String host = "smtp.office365.com";
-        properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.port", "587");
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
