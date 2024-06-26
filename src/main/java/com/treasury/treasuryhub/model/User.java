@@ -1,5 +1,6 @@
 package com.treasury.treasuryhub.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @CreationTimestamp
     @Column(name = "create_ts")
     private LocalDateTime create_ts;

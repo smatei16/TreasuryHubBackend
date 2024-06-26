@@ -12,6 +12,6 @@ public class FeedbackDto {
 
     private int rating;
     private String frequency;
-    private List<String> favouriteFunctionalities;
+//    private List<String> favouriteFunctionalities;
     private String comment;
 }

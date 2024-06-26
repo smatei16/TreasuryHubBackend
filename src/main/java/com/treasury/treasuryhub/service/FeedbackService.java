@@ -27,7 +27,7 @@ public class FeedbackService {
         feedback.setFrequency(feedbackDto.getFrequency());
         feedback.setComment(feedbackDto.getComment());
 
-        System.out.println(feedbackDto.getFavouriteFunctionalities());
+//        System.out.println(feedbackDto.getFavouriteFunctionalities());
 
         return feedbackRepository.save(feedback);
     }
