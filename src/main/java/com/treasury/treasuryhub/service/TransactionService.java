@@ -239,7 +239,7 @@ public class TransactionService {
         LocalDateTime endDate = time.atTime(LocalTime.MAX);
         LocalDateTime startDate = time.minusMonths(11).withDayOfMonth(1).atTime(LocalTime.MIN);
         User user = userService.fetchCurrentUser();
-        List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval2(user.getId(), startDate, endDate));
+        List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval(user.getId(), startDate, endDate));
 
         List<String> months = new ArrayList<>();
         List<Double> monthlyExpenses = new ArrayList<>();
