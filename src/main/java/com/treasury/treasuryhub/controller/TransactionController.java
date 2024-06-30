@@ -109,4 +109,19 @@ public class TransactionController {
         return new ResponseEntity<>(transactionService.getUserTransactionByDateAndTransactionCategory(month, year, id), HttpStatus.OK);
     }
 
+    @GetMapping("/monthly-summary")
+    public ResponseEntity<?> getMonthlySummary(){
+        return new ResponseEntity<>(transactionService.getMonthlySummary(), HttpStatus.OK);
+    }
+
+    @GetMapping("/category-summary/{type}")
+    public ResponseEntity<?> getCategorySummary(@PathVariable String type) {
+        return new ResponseEntity<>(transactionService.getCategorySummary(type), HttpStatus.OK);
+    }
+
+    @GetMapping("/monthly-category/{categoryId}")
+    public ResponseEntity<?> getMonthlyCategory(@PathVariable Integer categoryId) {
+        return new ResponseEntity<>(transactionService.getMonthlyCategorySummary(categoryId), HttpStatus.OK);
+    }
+
 }
