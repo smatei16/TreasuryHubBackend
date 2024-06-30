@@ -245,7 +245,7 @@ public class TransactionService {
         List<String> months = new ArrayList<>();
         List<Double> monthlyExpenses = new ArrayList<>();
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 11; i >= 0; i--) {
             YearMonth yearMonth = YearMonth.now().minusMonths(i);
             months.add(yearMonth.toString());
 
