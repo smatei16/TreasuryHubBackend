@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.YearMonth;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -190,7 +187,7 @@ public class TransactionService {
         List<Double> totalExpenses = new ArrayList<>();
         List<Double> totalIncomes = new ArrayList<>();
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 11; i >= 0; i--) {
             YearMonth yearMonth = YearMonth.now().minusMonths(i);
             months.add(yearMonth.toString());
 
@@ -209,10 +206,11 @@ public class TransactionService {
 
     public CategorySummaryResponseDto getCategorySummary(String type) {
         List<TransactionCategory> categories = transactionCategoryService.getTransactionCategoriesByUser();
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.withDayOfMonth(1);
+        LocalDate time = LocalDate.now();
+        LocalDateTime endDate = time.atTime(LocalTime.MAX);
+        LocalDateTime startDate = time.withDayOfMonth(1).atTime(LocalTime.MIN);
         User user = userService.fetchCurrentUser();
-        List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval2(user.getId(), startDate, endDate));
+        List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval(user.getId(), startDate, endDate));
 
         if (type != null && !type.isEmpty()) {
             transactions = transactions.stream()
@@ -237,8 +235,9 @@ public class TransactionService {
     }
 
     public MonthlyCategoryResponseDto getMonthlyCategorySummary(Integer categoryId) {
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusMonths(11).withDayOfMonth(1);
+        LocalDate time = LocalDate.now();
+        LocalDateTime endDate = time.atTime(LocalTime.MAX);
+        LocalDateTime startDate = time.minusMonths(11).withDayOfMonth(1).atTime(LocalTime.MIN);
         User user = userService.fetchCurrentUser();
         List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval2(user.getId(), startDate, endDate));
 
