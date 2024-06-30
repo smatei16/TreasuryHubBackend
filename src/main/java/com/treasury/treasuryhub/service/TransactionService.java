@@ -1,13 +1,12 @@
 package com.treasury.treasuryhub.service;
 
-import com.treasury.treasuryhub.dto.CategoryTotalsDto;
-import com.treasury.treasuryhub.dto.DetailedTransactionResponseDto;
-import com.treasury.treasuryhub.dto.TransactionDto;
+import com.treasury.treasuryhub.dto.*;
 import com.treasury.treasuryhub.exception.AccountNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionCategoryNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionNotFoundException;
 import com.treasury.treasuryhub.exception.TransactionTypeNotSupportedException;
 import com.treasury.treasuryhub.model.Transaction;
+import com.treasury.treasuryhub.model.TransactionCategory;
 import com.treasury.treasuryhub.model.User;
 import com.treasury.treasuryhub.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,10 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +35,9 @@ public class TransactionService {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private TransactionCategoryService transactionCategoryService;
 
     @Transactional
     public Transaction registerTransaction(TransactionDto transactionDto) throws AccountNotFoundException, TransactionTypeNotSupportedException, TransactionCategoryNotFoundException {
@@ -174,5 +178,90 @@ public class TransactionService {
                         (Double) result[3],
                         (Double) result[4])
         ).collect(Collectors.toList());
+    }
+
+    public MonthlySummaryResponseDto getMonthlySummary() {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusMonths(11).withDayOfMonth(1);
+        User user = userService.fetchCurrentUser();
+        List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval2(user.getId(), startDate, endDate));
+
+        List<String> months = new ArrayList<>();
+        List<Double> totalExpenses = new ArrayList<>();
+        List<Double> totalIncomes = new ArrayList<>();
+
+        for (int i = 0; i < 12; i++) {
+            YearMonth yearMonth = YearMonth.now().minusMonths(i);
+            months.add(yearMonth.toString());
+
+            LocalDate start = yearMonth.atDay(1);
+            LocalDate end = yearMonth.atEndOfMonth();
+
+            Map<String, Double> totals = transactions.stream()
+                    .filter(t -> !t.getDate().toLocalDateTime().toLocalDate().isBefore(start) && !t.getDate().toLocalDateTime().toLocalDate().isAfter(end))
+                    .collect(Collectors.groupingBy(DetailedTransactionResponseDto::getType, Collectors.summingDouble(DetailedTransactionResponseDto::getAmount)));
+
+            totalExpenses.add(totals.getOrDefault("EXPENSE", 0.0));
+            totalIncomes.add(totals.getOrDefault("INCOME", 0.0));
+        }
+        return new MonthlySummaryResponseDto(months, totalExpenses, totalIncomes);
+    }
+
+    public CategorySummaryResponseDto getCategorySummary(String type) {
+        List<TransactionCategory> categories = transactionCategoryService.getTransactionCategoriesByUser();
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.withDayOfMonth(1);
+        User user = userService.fetchCurrentUser();
+        List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval2(user.getId(), startDate, endDate));
+
+        if (type != null && !type.isEmpty()) {
+            transactions = transactions.stream()
+                    .filter(t -> t.getType().equalsIgnoreCase(type))
+                    .collect(Collectors.toList());
+            categories = categories.stream()
+                    .filter(c -> c.getTransactionType().equalsIgnoreCase(type))
+                    .collect(Collectors.toList());
+        }
+
+        List<String> categoryNames = categories.stream().map(TransactionCategory::getName).collect(Collectors.toList());
+        List<Double> categoryBudgets = categories.stream().map(TransactionCategory::getBudget).collect(Collectors.toList());
+
+        Map<Integer, Double> transactionTotals = transactions.stream()
+                .collect(Collectors.groupingBy(t -> t.getTransactionCategoryId(), Collectors.summingDouble(DetailedTransactionResponseDto::getAmount)));
+
+        List<Double> totalPerCategory = categories.stream()
+                .map(category -> transactionTotals.getOrDefault(category.getId(), 0.0))
+                .collect(Collectors.toList());
+
+        return new CategorySummaryResponseDto(categoryNames, totalPerCategory, categoryBudgets);
+    }
+
+    public MonthlyCategoryResponseDto getMonthlyCategorySummary(Integer categoryId) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusMonths(11).withDayOfMonth(1);
+        User user = userService.fetchCurrentUser();
+        List<DetailedTransactionResponseDto> transactions = convertObjectsToDetailedDto(transactionRepository.getDetailedTransactionByUserIdInInterval2(user.getId(), startDate, endDate));
+
+        List<String> months = new ArrayList<>();
+        List<Double> monthlyExpenses = new ArrayList<>();
+
+        for (int i = 0; i < 12; i++) {
+            YearMonth yearMonth = YearMonth.now().minusMonths(i);
+            months.add(yearMonth.toString());
+
+            LocalDate start = yearMonth.atDay(1);
+            LocalDate end = yearMonth.atEndOfMonth();
+
+            double totalExpense = transactions.stream()
+                    .filter(t -> t.getTransactionCategoryId() != null)
+                    .filter(t -> t.getTransactionCategoryId().equals(categoryId))
+                    .filter(t -> !t.getDate().toLocalDateTime().toLocalDate().isBefore(start) && !t.getDate().toLocalDateTime().toLocalDate().isAfter(end))
+                    .mapToDouble(DetailedTransactionResponseDto::getAmount)
+                    .sum();
+
+            monthlyExpenses.add(totalExpense);
+        }
+
+        return new MonthlyCategoryResponseDto(months, monthlyExpenses);
     }
 }
