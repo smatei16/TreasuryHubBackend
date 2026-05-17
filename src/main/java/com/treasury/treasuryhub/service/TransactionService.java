@@ -77,6 +77,11 @@ public class TransactionService {
 
     }
 
+    public List<DetailedTransactionResponseDto> getAllDetailedTransactions() {
+        ArrayList<Object[]> results = transactionRepository.getAllDetailedTransactions();
+        return convertObjectsToDetailedDto(results);
+    }
+
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
